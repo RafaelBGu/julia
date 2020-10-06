@@ -2564,8 +2564,8 @@ static Value *emit_f_is(jl_codectx_t &ctx, const jl_cgval_t &arg1, const jl_cgva
         (jl_pointer_egal(rt1) || jl_pointer_egal(rt2)))
         return ctx.builder.CreateICmpEQ(boxed(ctx, arg1), boxed(ctx, arg2));
 
-    bool justbits1 = jl_is_concrete_immutable(rt1);
-    bool justbits2 = jl_is_concrete_immutable(rt2);
+    bool justbits1 = jl_is_concrete_immutable(rt1) && ((jl_datatype_t*)rt1)->isinlinealloc;
+    bool justbits2 = jl_is_concrete_immutable(rt2) && ((jl_datatype_t*)rt2)->isinlinealloc;
     if (justbits1 || justbits2) { // whether this type is unique'd by value
         return emit_nullcheck_guard2(ctx, nullcheck1, nullcheck2, [&] () -> Value* {
             jl_value_t *typ = justbits1 ? rt1 : rt2;
